@@ -1,34 +1,37 @@
 from statcast_format_data import get_statcast_data
-from pybaseball import statcast_batter, spraychart, cache
+from pybaseball import playerid_lookup, statcast_batter, spraychart, cache
 
 cache.enable()
+player = playerid_lookup('Cortes', 'Nestor')
 
-df = get_statcast_data('2021-01-01', '2022-12-30', ['Sandy', 'Alcantara'], statcast_type='pitcher')
-sub_data = df[(df['home_team'] == 'NYM' ) | (df['away_team'] == "NYM")]
+df = get_statcast_data("2023-04-01",
+                       "2023-12-30",
+                       player["key_mlbam"][0],
+                       statcast_type='pitcher')
+
+#sub_data = df[(df['home_team'] == 'NYM' ) | (df['away_team'] == "NYM")]
 
 # spraychart(sub_data, 'marlins', title="Scherzer @ MIA ('16-'22)")
-sub_data.to_csv('pitchcast-data.csv')
+df.to_csv('pitchcast-data.csv')
 
 
-def onbase_percentage(sub_data):
-    # (OBP) = (hits + walks + hit by pitch) ÷ (at-bats + walks + hit by pitch + sacrifice flies)
+def pitch_count(sub_data):
+    sub_data = sub_data[sub_data['game_date'].dt.year == 2023]
+    sub_data = sub_data[sub_data['balls'] == 3]
+    pitcher = sub_data[sub_data['strikes'] == 2]
+    pitcher['year'] = pitcher['game_date'].dt.year
+    pitcher_stats = pitcher.loc[~pitcher['pitch_type'].isna()]
+    pitcher_seasons = pitcher_stats.groupby(['year', 'pitch_name']).agg({
+        'player_name': 'size',
+        'release_speed': 'mean',
+        'release_spin_rate': 'mean'
+    })
+    pitcher_seasons = pitcher_seasons.reset_index()
+    pitch_count = pitcher_seasons.groupby('year').sum().reset_index()
+    pitch_count = pitch_count.loc[:, ['year', 'player_name']]
+    pitcher_seasons = pitcher_seasons.merge(pitch_count, on='year')
+    pitcher_seasons['percent_thrown'] = pitcher_seasons['player_name_x'] / pitcher_seasons['player_name_y']
+    print(pitcher_seasons)
 
-    hits = sub_data['Is_Hit'].sum()
-    at_bats = sub_data['AB_flag'].sum()
-    hit_by_pitches = (sub_data['events'] == 'hit_by_pitch').sum()
-    walks = (sub_data['events'] == 'walk').sum()
-    sac_flies = (sub_data['events'] == 'sac_fly').sum()
-    sac_bunts = (sub_data['events'] == 'sac_bunt').sum()
 
-    obp = (hits + walks + hit_by_pitches) / (at_bats + walks +hit_by_pitches + sac_flies + sac_bunts)
-    return obp
-
-
-def strikeout_rate(sub_data):
-    strikeouts = (sub_data['events'] == 'strikeout').sum()
-    at_bats = sub_data['AB_flag'].sum()
-    return strikeouts / at_bats
-
-
-print(onbase_percentage(sub_data))
-print(strikeout_rate(sub_data))
+pitch_count(df)

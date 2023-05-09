@@ -76,12 +76,12 @@ def addOns(df):
     return sav
 
 
-def get_statcast_data(start_date, end_date, pitcher_name, statcast_type='batter'):
+def get_statcast_data(start_date, end_date, player_id, statcast_type='batter'):
     if statcast_type == 'batter':
         df = statcast_batter(start_date, end_date,
-                             get_player_id(pitcher_name[0], pitcher_name[1]))
+                             player_id)
     else:
         df = statcast_pitcher(start_date, end_date, player_id=
-                              get_player_id(pitcher_name[0], pitcher_name[1]))
+                              player_id)
     df = addOns(df)
     return df
