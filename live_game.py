@@ -44,10 +44,9 @@ def get_next_batter(pitcher_stats, batting_order):
 
 def run_game_data():
     # https://www.reddit.com/r/Sabermetrics/comments/99yvdc/statsapi_working_documentation/
-    sched = statsapi.schedule(start_date='04/27/2023',
-                              end_date='04/27/2023',
-                              team=121,
-                              opponent=120)
+    sched = statsapi.schedule(start_date='05/10/2023',
+                              end_date='05/10/2023',
+                              team=147)
     line_score = statsapi.linescore(sched[0]['game_id'])
     box_score = statsapi.boxscore(sched[0]['game_id'])
     box_score_data = statsapi.boxscore_data(sched[0]['game_id'])
@@ -57,20 +56,22 @@ def run_game_data():
     print(f"The count is {data['count']['balls']}-{data['count']['strikes']}.  {data['count']['outs']} outs.")
     print(f"B: {data['matchup']['batSide']['code']} {data['matchup']['batter']['fullName']} ({data['matchup']['batter']['id']})")
     print(f"P: {data['matchup']['pitchHand']['code']} {data['matchup']['pitcher']['fullName']} ({data['matchup']['pitcher']['id']})")
-    print(f"{data['playEvents']}")
+    if data.get('playEvents'):
+        for data in data.get('playEvents'):
+            print(data["details"])
 
-    batter_df = get_statcast_data('2023-01-01', '2023-12-30', data['matchup']['batter']['id'],
-                                  statcast_type='batter')
-    batter_pitch_counts = batter_df['pitch_name'].value_counts(normalize=True)
-    print(batter_pitch_counts[:3])
-    pitcher_df = get_statcast_data('2023-01-01', '2023-12-30', data['matchup']['pitcher']['id'],
-                                  statcast_type='pitcher')
-    pitcher_df = pitcher_df[pitcher_df['balls'] == data['count']['balls']]
-    pitcher_df = pitcher_df[pitcher_df['strikes'] == data['count']['strikes']]
-    pitcher_pitch_counts = pitcher_df['pitch_name'].value_counts(normalize=True)
-    print(pitcher_pitch_counts[:3])
+    # batter_df = get_statcast_data('2023-01-01', '2023-12-30', data['matchup']['batter']['id'],
+    #                               statcast_type='batter')
+    # batter_pitch_counts = batter_df['pitch_name'].value_counts(normalize=True)
+    # print(batter_pitch_counts[:3])
+    # pitcher_df = get_statcast_data('2023-01-01', '2023-12-30', data['matchup']['pitcher']['id'],
+    #                               statcast_type='pitcher')
+    # pitcher_df = pitcher_df[pitcher_df['balls'] == data['count']['balls']]
+    # pitcher_df = pitcher_df[pitcher_df['strikes'] == data['count']['strikes']]
+    # pitcher_pitch_counts = pitcher_df['pitch_name'].value_counts(normalize=True)
+    # print(pitcher_pitch_counts[:3])
     print('----------------------------------------------')
 
 while True:
     run_game_data()
-    time.sleep(20)
+    time.sleep(10)

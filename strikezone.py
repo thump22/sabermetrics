@@ -105,11 +105,11 @@ def general_strikezone(data, firstname, lastname, posid):
     plt.show()
 
 
-player = playerid_lookup('Cortes', 'Nestor')
-
-df = get_statcast_data("2023-04-01",
-                       "2023-12-30",
-                       player["key_mlbam"][0],
-                       statcast_type='pitcher')
-# df = df[df['Is_Hit'] == 1]
-general_strikezone(df, 'Nestor', 'Cortes', 'pitcher')
+# player = playerid_lookup('Cortes', 'Nestor')
+#
+# df = get_statcast_data("2023-04-01",
+#                        "2023-12-30",
+#                        player["key_mlbam"][0],
+#                        statcast_type='pitcher')
+# # df = df[df['Is_Hit'] == 1]
+# general_strikezone(df, 'Nestor', 'Cortes', 'pitcher')
