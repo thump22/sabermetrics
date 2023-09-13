@@ -13,13 +13,13 @@ matplotlib.use('module://backend_interagg')
 team = "NYM"
 team_nickname = "reds"
 year = 2023
-start_date = "2023-05-15"
-end_date = "2023-05-15"
+start_date = "2023-03-27"
+end_date = "2023-12-12"
 
 team_batting = team_batting_bref(team, year)
 team_batting = team_batting[team_batting['Pos'] != "P"]
 team_batting[["BA", "OBP", "SLG", "OPS", "OPS+", "HR", "RBI", "R", "SB", "SO", "PA"]] = team_batting[["BA", "OBP", "SLG", "OPS", "OPS+", "HR", "RBI", "R", "SB", "SO", "PA"]].apply(pd.to_numeric, errors='coerce', axis=1)
-plate_app_threshold = np.percentile(team_batting["PA"], 10)
+plate_app_threshold = np.percentile(team_batting["PA"], 25)
 team_batting = team_batting[team_batting['PA'] >= plate_app_threshold]
 team_batting["SO %"] = team_batting["SO"]/team_batting["PA"]
 team_batting = team_batting.sort_values(by='OPS+', ascending=False)
@@ -35,12 +35,12 @@ for player in players:
                                player_mlb["key_mlbam"][0],
                                statcast_type='batter')
         if not df.empty:
-            # hit_df = df[df['Is_Hit'] == 1]
+            hit_df = df[df['Is_Hit'] == 1]
             # spraychart(df, team_nickname, title=f'{player} Hit Chart ({start_date} - {end_date})',
             #            width=1000,
             #            height=1000,
             #            size=50)
-            general_strikezone(df, player.split()[0], player.split()[1], 'batter')
+            general_strikezone(hit_df, player.split()[0], player.split()[1], 'batter')
         else:
             del df
     except:

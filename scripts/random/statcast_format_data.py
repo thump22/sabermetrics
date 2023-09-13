@@ -1,5 +1,4 @@
-from get_player_id import get_player_id
-from pybaseball import statcast_pitcher, statcast_batter, spraychart, cache
+from pybaseball import statcast_pitcher, statcast_batter, cache
 
 import numpy as np
 import pandas as pd
@@ -73,6 +72,9 @@ def addOns(df):
 
     sav['BatterTeam'] = np.where(sav['inning_topbot'] == 'Top', sav['away_team'], sav['home_team'])
     sav['PitcherTeam'] = np.where(sav['inning_topbot'] == 'Top', sav['home_team'], sav['away_team'])
+
+    sav['in_scoring_position'] = np.where((sav['on_2b'].notnull() & sav['on_3b'].notnull()), True, False)
+
     return sav
 
 
